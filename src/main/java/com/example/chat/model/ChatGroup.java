@@ -1,8 +1,9 @@
-package com.example.chat.domain;
+package com.example.chat.model;
 
-import com.example.chat.service.ChatService;
-import lombok.*;
-import org.springframework.web.socket.WebSocketSession;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.HashSet;
 import java.util.Set;

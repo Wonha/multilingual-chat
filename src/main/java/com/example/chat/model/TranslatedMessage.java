@@ -1,14 +1,14 @@
-package com.example.chat.domain;
+package com.example.chat.model;
 
-import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-@EqualsAndHashCode(of = "preferredLanguage")
+@EqualsAndHashCode(of = "lang")
 public class TranslatedMessage {
-    private String language;
+    private String lang;
     private String text;
+
 }

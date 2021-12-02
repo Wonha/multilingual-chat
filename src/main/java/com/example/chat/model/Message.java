@@ -1,11 +1,10 @@
-package com.example.chat.domain;
+package com.example.chat.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-
 
 import java.util.Set;
 
@@ -22,7 +21,7 @@ public class Message {
     private Type type;
     private String groupId;
     private User sender;
-
+    private String createdAt;
     private String text;
     private Set<TranslatedMessage> translatedMessage;
     @JsonIgnore

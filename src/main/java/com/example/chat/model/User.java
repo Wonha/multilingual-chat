@@ -1,4 +1,4 @@
-package com.example.chat.domain;
+package com.example.chat.model;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

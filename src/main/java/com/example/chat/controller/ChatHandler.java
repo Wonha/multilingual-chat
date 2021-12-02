@@ -1,8 +1,7 @@
 package com.example.chat.controller;
 
-import com.example.chat.domain.ChatGroup;
-import com.example.chat.domain.Message;
-import com.example.chat.service.ChatService;
+import com.example.chat.model.Message;
+import com.example.chat.service.MessageService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,16 +16,16 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 @RequiredArgsConstructor
 public class ChatHandler extends TextWebSocketHandler {
     private final ObjectMapper objectMapper;
-    private final ChatService chatService;
+    private final MessageService messageService;
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         String payload = message.getPayload();
-        log.info("New message: {}", payload);
+        log.debug("New message: {}", payload);
 
         Message newMessage = objectMapper.readValue(payload, Message.class);
         newMessage.getSender().setWebSocketSession(session);
-        chatService.handleMessage(session, newMessage);
+        messageService.handleMessage(session, newMessage);
     }
 
     @Override

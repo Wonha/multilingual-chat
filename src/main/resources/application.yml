@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: chat
+
+logging:
+  level:
+    com.example.*: DEBUG
+
+
+gcp:
+  project-id: "m10lchat-antidote-demo"
+thread-pool:
+  main:
+    size:
+      core: 100
+      max: 100
+      queue: 500
+
+translation:
+  uri: "http://"

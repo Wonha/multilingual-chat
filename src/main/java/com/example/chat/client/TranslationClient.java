@@ -31,7 +31,6 @@ public class TranslationClient {
                             .addContents(text)
                             .build();
 
-            log.debug("Translation {}, {}", preferredLanguage, text);
             TranslateTextResponse response = client.translateText(request);
 
             return CompletableFuture.completedFuture(

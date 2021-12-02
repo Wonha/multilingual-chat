@@ -50,6 +50,8 @@ public class MessageService {
     }
 
     private void processMessageType(Message message, ChatGroup group) {
+        message.setCreatedAt(java.time.Instant.now().toString());
+        message.setId(UUID.randomUUID().toString());
         switch (message.getType()) {
             case ENTER:
                 groupService.enterGroup(group, message.getSender());

@@ -1,7 +1,6 @@
 package com.example.chat.controller;
 
 import com.example.chat.model.Message;
-import com.example.chat.service.GroupService;
 import com.example.chat.service.MessageService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;

@@ -24,10 +24,10 @@ import java.util.stream.Collectors;
 public class MessageService {
     private final ObjectMapper objectMapper;
     private final TranslationClient translationClient;
-    private final ChatGroupService chatGroupService;
+    private final GroupService groupService;
 
     public void handleMessage(WebSocketSession session, Message message) {
-        ChatGroup group = chatGroupService.findGroupById(message.getGroupId());
+        ChatGroup group = groupService.findGroupById(message.getGroupId());
         if (null == group) {
             sendMessage(session, "Chat group not exist " + message.getGroupId());
             return;
@@ -52,13 +52,15 @@ public class MessageService {
     private void processMessageType(Message message, ChatGroup group) {
         switch (message.getType()) {
             case ENTER:
-                group.getUsers().add(message.getSender());
-                message.setText("[System] " + message.getSender().getName() + " has entered");
+                groupService.enterGroup(group, message.getSender());
+                message.setText("[System] " + message.getSender().getName() + " has joined");
                 break;
             case TALK:
                 message.setText("[" + message.getSender().getName()+ "] "+ message.getText());
                 break;
             case EXIT:
+                groupService.exitGroup(group, message.getSender());
+                message.setText("[System] " + message.getSender().getName() + " has left");
                 break;
             default:
         }
@@ -89,5 +91,20 @@ public class MessageService {
         } catch (IOException e) {
             log.error(e.getMessage(), e);
         }
+    }
+
+    public Message newExitMessageOf(String sessionId) {
+        ChatGroup group = groupService.findGroupBySessionId(sessionId);
+        User sender = null;
+        for (User u : group.getUsers()) {
+            if (u.getWebSocketSession().getId().equals(sessionId)) {
+                sender = u;
+            }
+        }
+        return Message.builder()
+                .type(Message.Type.EXIT)
+                .groupId(group.getId())
+                .sender(sender)
+                .build();
     }
 }

@@ -1,10 +1,7 @@
 package com.example.chat.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.Set;
 
@@ -27,4 +24,10 @@ public class Message {
     @JsonIgnore
     private String disruptiveScore;
 
+    @Builder
+    public Message(Type type, String groupId, User sender) {
+        this.type = type;
+        this.groupId = groupId;
+        this.sender = sender;
+    }
 }

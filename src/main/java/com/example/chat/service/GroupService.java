@@ -3,6 +3,7 @@ package com.example.chat.service;
 import com.example.chat.model.ChatGroup;
 import com.example.chat.model.User;
 import com.example.chat.repository.GroupRepository;
+import com.example.chat.repository.SessionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,9 +16,10 @@ import java.util.UUID;
 @Service
 public class GroupService {
     private final GroupRepository groupRepository;
+    private final SessionRepository sessionRepository;
 
     public List<ChatGroup> findAllGroups() {
-        return groupRepository.findAllGroups();
+        return groupRepository.findAll();
     }
 
     public ChatGroup findGroupById(String id) {
@@ -26,25 +28,29 @@ public class GroupService {
 
     public ChatGroup createGroup(String name) {
         String newId = UUID.randomUUID().toString();
-        ChatGroup newGroup = ChatGroup.builder().id(newId).name(name).build();
-        groupRepository.createGroup(newGroup);
+        ChatGroup newGroup = ChatGroup.builder()
+                .id(newId)
+                .name(name)
+                .build();
+        groupRepository.save(newGroup);
         return newGroup;
     }
 
     public void enterGroup(ChatGroup group, User sender) {
         group.getUsers().add(sender);
-        groupRepository.addSession(group.getId(), sender.getWebSocketSession());
+        groupRepository.save(group);
+        sessionRepository.save(group.getId(), sender.getWebSocketSession());
     }
 
     public ChatGroup findGroupBySessionId(String sessionId) {
-        return groupRepository.findGroupBySessionId(sessionId);
+        return groupRepository.findGroupById(sessionRepository.findGroupBySessionId(sessionId));
     }
 
     public void exitGroup(ChatGroup group, User sender) {
         group.getUsers().remove(sender);
         if (group.getUsers().size() <= 0) {
-            groupRepository.removeGroup(group.getId());
+            groupRepository.remove(group.getId());
         }
-        groupRepository.removeSession(sender.getWebSocketSession().getId());
+        sessionRepository.remove(sender.getWebSocketSession().getId());
     }
 }

@@ -11,6 +11,7 @@ gcp:
   project-id: "m10lchat-antidote-demo"
 thread-pool:
   main:
+    prefix: "translate-exec"
     size:
       core: 100
       max: 100

@@ -11,10 +11,9 @@ import java.util.Map;
 
 @Repository
 public class GroupRepository {
-    private Map<String, String> session2GroupId = new HashMap<>();
     private Map<String, ChatGroup> groupId2Group = new HashMap<>();
 
-    public List<ChatGroup> findAllGroups() {
+    public List<ChatGroup> findAll() {
         return new ArrayList<>(groupId2Group.values());
     }
 
@@ -22,24 +21,12 @@ public class GroupRepository {
         return groupId2Group.get(id);
     }
 
-    public ChatGroup createGroup(ChatGroup newGroup) {
-        groupId2Group.put(newGroup.getId(), newGroup);
-        return newGroup;
+    public ChatGroup save(ChatGroup group) {
+        groupId2Group.put(group.getId(), group);
+        return group;
     }
 
-    public ChatGroup findGroupBySessionId(String id) {
-        return groupId2Group.get(session2GroupId.get(id));
-    }
-
-    public void addSession(String groupId, WebSocketSession webSocketSession) {
-        session2GroupId.put(webSocketSession.getId(), groupId);
-    }
-
-    public void removeSession(String sessionId) {
-        session2GroupId.remove(sessionId);
-    }
-
-    public void removeGroup(String id) {
+    public void remove(String id) {
         groupId2Group.remove(id);
     }
 }

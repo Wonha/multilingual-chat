@@ -20,7 +20,7 @@ public class Message {
     private User sender;
     private String createdAt;
     private String text;
-    private Set<TranslatedMessage> translatedMessage;
+    private Set<MessageWithLanguage> translatedMessage;
     @JsonIgnore
     private String disruptiveScore;
 

@@ -3,8 +3,9 @@ package com.example.chat.service;
 import com.example.chat.client.TranslationClient;
 import com.example.chat.model.ChatGroup;
 import com.example.chat.model.Message;
-import com.example.chat.model.TranslatedMessage;
+import com.example.chat.model.MessageWithLanguage;
 import com.example.chat.model.User;
+import com.example.chat.repository.MessageRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +26,7 @@ public class MessageService {
     private final ObjectMapper objectMapper;
     private final TranslationClient translationClient;
     private final GroupService groupService;
+    private final MessageRepository messageRepository;
 
     public void handleMessage(WebSocketSession session, Message message) {
         ChatGroup group = groupService.findGroupById(message.getGroupId());
@@ -35,17 +37,31 @@ public class MessageService {
 
         processMessageType(message, group);
 
+        // Detect original language
+        List<CompletableFuture<Void>> completableFutures = new ArrayList<>();
+        MessageWithLanguage original = MessageWithLanguage.builder().text(message.getText()).build();
+        original.setOriginal(true);
+        CompletableFuture<Void> detection = translationClient.detectLanguage(message.getText())
+                .thenAccept(original::setLang);
+        completableFutures.add(detection);
+
         // Create translations in target language
-        Map<String, TranslatedMessage> lang2Translation = createTranslations(message.getText(),
+        Map<String, MessageWithLanguage> lang2Translation = createTranslations(message.getText(),
                 group.getUsers().stream()
                         .map(User::getLang)
-                        .collect(Collectors.toSet()));
+                        .collect(Collectors.toSet()), completableFutures);
+        completableFutures.forEach(CompletableFuture::join);
+        log.debug("Completion <<");
+
+        lang2Translation.put(original.getLang(), original);
         message.setTranslatedMessage(new HashSet<>(lang2Translation.values()));
+        messageRepository.save(message);
 
         // Send translations to users in group
         group.getUsers().forEach(u -> {
-            TranslatedMessage translation = lang2Translation.get(u.getLang());
-            sendMessage(u.getWebSocketSession(), translation);
+            MessageWithLanguage translation = lang2Translation.get(u.getLang());
+            Set<MessageWithLanguage> messages = new HashSet<>(Arrays.asList(original, translation));
+            sendMessage(u.getWebSocketSession(), messages);
         });
     }
 
@@ -68,21 +84,17 @@ public class MessageService {
         }
     }
 
-    private Map<String, TranslatedMessage> createTranslations(String text, Set<String> targetLanguages) {
-        List<CompletableFuture<Void>> cList = new ArrayList<>();
+    private Map<String, MessageWithLanguage> createTranslations(String text, Set<String> targetLanguages, List<CompletableFuture<Void>> cList) {
 
-        Map<String, TranslatedMessage> lang2Translation = targetLanguages.stream()
+        Map<String, MessageWithLanguage> lang2Translation = targetLanguages.stream()
                 .collect(Collectors.toMap(Function.identity(), (lang -> {
-                    TranslatedMessage translated = new TranslatedMessage();
-                    translated.setLang(lang);
+                    MessageWithLanguage translated = MessageWithLanguage.builder().lang(lang).build();
                     CompletableFuture<Void> c = translationClient
                             .translate(text, translated.getLang())
                             .thenAccept(translated::setText);
                     cList.add(c);
                     return translated;
                 })));
-
-        cList.forEach(CompletableFuture::join);
 
         return lang2Translation;
     }

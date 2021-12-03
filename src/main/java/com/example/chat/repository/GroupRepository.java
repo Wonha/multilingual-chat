@@ -2,7 +2,6 @@ package com.example.chat.repository;
 
 import com.example.chat.model.ChatGroup;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.socket.WebSocketSession;
 
 import java.util.ArrayList;
 import java.util.HashMap;

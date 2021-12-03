@@ -48,9 +48,10 @@ public class GroupService {
 
     public void exitGroup(ChatGroup group, User sender) {
         group.getUsers().remove(sender);
-        if (group.getUsers().size() <= 0) {
+        if (group.isEmpty()) {
             groupRepository.remove(group.getId());
         }
         sessionRepository.remove(sender.getWebSocketSession().getId());
     }
+
 }

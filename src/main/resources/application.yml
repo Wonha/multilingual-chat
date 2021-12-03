@@ -6,7 +6,6 @@ logging:
   level:
     com.example.*: DEBUG
 
-
 gcp:
   project-id: "m10lchat-antidote-demo"
 thread-pool:

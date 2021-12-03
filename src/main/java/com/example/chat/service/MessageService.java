@@ -47,9 +47,8 @@ public class MessageService {
 
         // Create translations in target language
         Map<String, MessageWithLanguage> lang2Translation = createTranslations(message.getText(),
-                group.getUsers().stream()
-                        .map(User::getLang)
-                        .collect(Collectors.toSet()), completableFutures);
+                group.findPreferredLanguages(),
+                completableFutures);
         completableFutures.forEach(CompletableFuture::join);
         log.debug("Completion <<");
 
@@ -85,8 +84,7 @@ public class MessageService {
     }
 
     private Map<String, MessageWithLanguage> createTranslations(String text, Set<String> targetLanguages, List<CompletableFuture<Void>> cList) {
-
-        Map<String, MessageWithLanguage> lang2Translation = targetLanguages.stream()
+        return targetLanguages.stream()
                 .collect(Collectors.toMap(Function.identity(), (lang -> {
                     MessageWithLanguage translated = MessageWithLanguage.builder().lang(lang).build();
                     CompletableFuture<Void> c = translationClient
@@ -95,16 +93,6 @@ public class MessageService {
                     cList.add(c);
                     return translated;
                 })));
-
-        return lang2Translation;
-    }
-
-    public <T> void sendMessage(WebSocketSession session, T message) {
-        try {
-            session.sendMessage(new TextMessage(objectMapper.writeValueAsString(message)));
-        } catch (IOException e) {
-            log.error(e.getMessage(), e);
-        }
     }
 
     public Message newExitMessageOf(String sessionId) {
@@ -121,4 +109,13 @@ public class MessageService {
                 .sender(sender)
                 .build();
     }
+
+    private <T> void sendMessage(WebSocketSession session, T message) {
+        try {
+            session.sendMessage(new TextMessage(objectMapper.writeValueAsString(message)));
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+        }
+    }
+
 }

@@ -12,18 +12,18 @@ import java.util.List;
 public class ChatController {
     private final GroupService chatService;
 
-    @PostMapping("/chats")
+    @PostMapping("/chats/groups")
     public ChatGroup createGroup(@RequestParam String name) {
         return chatService.createGroup(name);
     }
 
-    @GetMapping("/chats")
+    @GetMapping("/chats/groups")
     public List<ChatGroup> findAllGroups() {
         return chatService.findAllGroups();
     }
 
-    @GetMapping("/chats/{id}")
-    public List<ChatGroup> findChatByGroupId(@PathVariable String id) {
+    @GetMapping("/chats/groups/{groupId}")
+    public List<ChatGroup> findGroupById(@PathVariable String groupId) {
         return null;
     }
 }

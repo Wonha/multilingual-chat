@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -20,5 +21,15 @@ public class ChatGroup {
     public ChatGroup(String id, String name) {
         this.id = id;
         this.name = name;
+    }
+
+    public Set<String> findPreferredLanguages() {
+        return this.getUsers().stream()
+                .map(User::getLang)
+                .collect(Collectors.toSet());
+    }
+
+    public boolean isEmpty() {
+        return this.getUsers().size() <= 0;
     }
 }

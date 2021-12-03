@@ -8,7 +8,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -24,6 +23,7 @@ public class TranslationClient {
     public CompletableFuture<String> translate(String text, String preferredLanguage) {
         try (TranslationServiceClient client = TranslationServiceClient.create()) {
             LocationName parent = LocationName.of(gcpConfig.getProjectId(), "global");
+
             TranslateTextRequest request =
                     TranslateTextRequest.newBuilder()
                             .setParent(parent.toString())
@@ -32,12 +32,6 @@ public class TranslationClient {
                             .addContents(text)
                             .build();
 
-            log.debug("Translation >>");
-            try {
-                Thread.sleep(5000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
             TranslateTextResponse response = client.translateText(request);
 
             return CompletableFuture.completedFuture(
@@ -63,30 +57,16 @@ public class TranslationClient {
                             .setContent(text)
                             .build();
 
-            log.debug("Detection >>");
-            try {
-                Thread.sleep(5000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
             DetectLanguageResponse response = client.detectLanguage(request);
 
-            for (DetectedLanguage language : response.getLanguagesList()) {
-                // The language detected
-                System.out.printf("Language code: %s\n", language.getLanguageCode());
-                // Confidence of detection result for this language
-                System.out.printf("Confidence: %s\n", language.getConfidence());
-            }
             return CompletableFuture.completedFuture(
                     response.getLanguagesList().stream()
-                            .min((l1, l2) -> l1.getConfidence() > l2.getConfidence() ? 1 : 0)
+                            .max((l1, l2) -> l1.getConfidence() > l2.getConfidence() ? 1 : -1)
                             .map(DetectedLanguage::getLanguageCode)
                             .orElse(""));
         } catch (IOException e) {
             log.warn("Language Detection failed {}", e);
             return CompletableFuture.completedFuture("unknown");
         }
-
-
     }
 }

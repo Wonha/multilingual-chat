@@ -11,13 +11,12 @@ import java.util.Set;
 public class MessageDisplay {
     private String id;
     private int num;
-    private MessageWithLanguage original;
     private String lang;
     private String text;
     private Message.Type type;
     private String createdAt;
-    private User sender;
-    private Set<MessageWithLanguage> translation;
+    private String sender;
+    private Set<MessageWithLanguage> translations;
 
     @Builder
     public MessageDisplay(
@@ -27,8 +26,8 @@ public class MessageDisplay {
             String text,
             Message.Type type,
             String createdAt,
-            User sender,
-            Set<MessageWithLanguage> translation) {
+            String sender,
+            Set<MessageWithLanguage> translations) {
         this.id = id;
         this.num = num;
         this.lang = lang;
@@ -36,6 +35,6 @@ public class MessageDisplay {
         this.type = type;
         this.createdAt = createdAt;
         this.sender = sender;
-        this.translation = translation;
+        this.translations = translations;
     }
 }

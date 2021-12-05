@@ -68,9 +68,9 @@ public class MessageService {
                     .lang(original.getLang())
                     .text(original.getText())
                     .type(message.getType())
-                    .sender(message.getSender())
+                    .sender(message.getSender().getName())
                     .createdAt(message.getCreatedAt())
-                    .translation(translation)
+                    .translations(translation)
                     .build();
             display.add(latestMessage);
             sendMessage(u.getWebSocketSession(), display);

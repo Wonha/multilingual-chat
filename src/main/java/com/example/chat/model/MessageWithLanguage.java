@@ -11,7 +11,6 @@ import lombok.Setter;
 public class MessageWithLanguage {
     private String lang;
     private String text;
-    private boolean isOriginal;
 
     @Builder
     public MessageWithLanguage(String lang, String text) {

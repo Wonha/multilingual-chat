@@ -1,10 +1,7 @@
 package com.example.chat.service;
 
 import com.example.chat.client.TranslationClient;
-import com.example.chat.model.ChatGroup;
-import com.example.chat.model.Message;
-import com.example.chat.model.MessageWithLanguage;
-import com.example.chat.model.User;
+import com.example.chat.model.*;
 import com.example.chat.repository.MessageRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -40,7 +37,7 @@ public class MessageService {
         // Detect original language
         List<CompletableFuture<Void>> completableFutures = new ArrayList<>();
         MessageWithLanguage original = MessageWithLanguage.builder().text(message.getText()).build();
-        original.setOriginal(true);
+//        original.setOriginal(true);
         CompletableFuture<Void> detection = translationClient.detectLanguage(message.getText())
                 .thenAccept(original::setLang);
         completableFutures.add(detection);
@@ -58,26 +55,45 @@ public class MessageService {
 
         // Send translations to users in group
         group.getUsers().forEach(u -> {
-            MessageWithLanguage translation = lang2Translation.get(u.getLang());
-            Set<MessageWithLanguage> messages = new HashSet<>(Arrays.asList(original, translation));
-            sendMessage(u.getWebSocketSession(), messages);
+            Set<MessageWithLanguage> translation = new HashSet<>();
+            if (!Objects.equals(original.getText(), u.getLang())) {
+                MessageWithLanguage preferredTranslation = lang2Translation.get(u.getLang());
+                translation.add(preferredTranslation);
+            }
+
+            Set<MessageDisplay> display = new HashSet<>();
+            MessageDisplay latestMessage = MessageDisplay.builder()
+                    .id(message.getId())
+                    .lang(original.getLang())
+                    .text(original.getText())
+                    .type(message.getType())
+                    .sender(message.getSender())
+                    .createdAt(message.getCreatedAt())
+                    .translation(translation)
+                    .build();
+            display.add(latestMessage);
+            sendMessage(u.getWebSocketSession(), display);
         });
     }
 
     private void processMessageType(Message message, ChatGroup group) {
-        message.setCreatedAt(java.time.Instant.now().toString());
         message.setId(UUID.randomUUID().toString());
+        message.setCreatedAt(java.time.Instant.now().toString());
+        String senderName;
         switch (message.getType()) {
             case ENTER:
                 groupService.enterGroup(group, message.getSender());
-                message.setText("[System] " + message.getSender().getName() + " has joined");
+                senderName = message.getSender().getName();
+                message.setSender(User.newSystemUser(message.getSender().getLang()));
+                message.setText(senderName + " has joined");
                 break;
             case TALK:
-                message.setText("[" + message.getSender().getName()+ "] "+ message.getText());
                 break;
             case EXIT:
                 groupService.exitGroup(group, message.getSender());
-                message.setText("[System] " + message.getSender().getName() + " has left");
+                senderName = message.getSender().getName();
+                message.setSender(User.newSystemUser(message.getSender().getLang()));
+                message.setText(senderName + " has left");
                 break;
             default:
         }

@@ -10,6 +10,7 @@ import java.util.Set;
 @EqualsAndHashCode(of = "id")
 public class MessageDisplay {
     private String id;
+    private int num;
     private MessageWithLanguage original;
     private String lang;
     private String text;
@@ -21,6 +22,7 @@ public class MessageDisplay {
     @Builder
     public MessageDisplay(
             String id,
+            int num,
             String lang,
             String text,
             Message.Type type,
@@ -28,6 +30,7 @@ public class MessageDisplay {
             User sender,
             Set<MessageWithLanguage> translation) {
         this.id = id;
+        this.num = num;
         this.lang = lang;
         this.text = text;
         this.type = type;

@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 public class ChatGroup {
     private String id;
     private String name;
+    private int messageNum;
     private Set<User> users = new HashSet<>();
 
     @Builder
@@ -31,5 +32,9 @@ public class ChatGroup {
 
     public boolean isEmpty() {
         return this.getUsers().size() <= 0;
+    }
+
+    public int increaseAndGetMessageNum() {
+        return this.messageNum++;
     }
 }

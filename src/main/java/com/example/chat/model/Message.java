@@ -12,6 +12,7 @@ import java.util.Set;
 public class Message {
 
     private String id;
+    private int num;
     public enum Type {
         ENTER, TALK, EXIT
     }

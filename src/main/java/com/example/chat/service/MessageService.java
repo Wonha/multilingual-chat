@@ -64,6 +64,7 @@ public class MessageService {
             Set<MessageDisplay> display = new HashSet<>();
             MessageDisplay latestMessage = MessageDisplay.builder()
                     .id(message.getId())
+                    .num(message.getNum())
                     .lang(original.getLang())
                     .text(original.getText())
                     .type(message.getType())
@@ -78,6 +79,7 @@ public class MessageService {
 
     private void processMessageType(Message message, ChatGroup group) {
         message.setId(UUID.randomUUID().toString());
+        message.setNum(group.increaseAndGetMessageNum());
         message.setCreatedAt(java.time.Instant.now().toString());
         String senderName;
         switch (message.getType()) {

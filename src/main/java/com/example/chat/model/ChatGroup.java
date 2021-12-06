@@ -35,6 +35,6 @@ public class ChatGroup {
     }
 
     public int increaseAndGetMessageNum() {
-        return this.messageNum++;
+        return ++this.messageNum;
     }
 }

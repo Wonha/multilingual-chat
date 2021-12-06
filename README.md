@@ -1,16 +1,27 @@
 # Multilingual Chat
 
-1. Chat group id を生成する。
+1. サーバーの Chat group 一覧をみる。
+```shell
+curl --location --request GET 'http://${SERVER_ADDRESS}/chats/groups'
+```
+  - 特定の group の詳細情報も確認できる。
+```shell
+curl --location --request GET 'http://${SERVER_ADDRESS}/chats/groups/{group_id}'
+```
+
+
+2. 新しい Chat group を生成する場合、以下の endpoint で新しい group id を返してもらう。
 ```sh
 curl --location --request POST 'http://${SERVER_ADDRESS}/chats/groups' \
 --header 'Content-Type: application/x-www-form-urlencoded' \
 --data-urlencode 'name=My Test Room'
 ```
 
-2. サーバーへ WebSocket プロトコルで接続する。  
+3. Chat を開始するには、サーバーへ WebSocket プロトコルで接続する。  
 `ws://${SERVER_ADDRESS}/ws/chat`
 
-3. 入りたい Chat group に入場する。
+
+4. 入りたい Chat group に入場する。
 ```json
 {
   "type": "ENTER",
@@ -23,7 +34,7 @@ curl --location --request POST 'http://${SERVER_ADDRESS}/chats/groups' \
 }
 ```
 
-4. 好きな言語で会話する。
+5. 好きな言語で会話する。
 ```json
 {
   "type": "TALK",
@@ -36,7 +47,7 @@ curl --location --request POST 'http://${SERVER_ADDRESS}/chats/groups' \
 }
 ```
 
-レスポンスの例（ユーザーの言語選択が en の場合）：
+  - レスポンスの例（ユーザーの言語選択が en の場合）：
 ```json
 [
   {
@@ -57,9 +68,4 @@ curl --location --request POST 'http://${SERVER_ADDRESS}/chats/groups' \
     ]
   }
 ]
-```
-
-サーバーの Chat Group 一覧をみる。
-```shell
-curl --location --request GET 'http://${SERVER_ADDRESS}/chats/groups
 ```

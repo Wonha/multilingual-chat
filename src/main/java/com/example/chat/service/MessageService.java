@@ -129,6 +129,7 @@ public class MessageService {
 
     private <T> void sendMessage(WebSocketSession session, T message) {
         try {
+            log.debug("Response {}", message);
             session.sendMessage(new TextMessage(objectMapper.writeValueAsString(message)));
         } catch (IOException e) {
             log.error(e.getMessage(), e);

@@ -23,7 +23,7 @@ public class ChatController {
     }
 
     @GetMapping("/chats/groups/{groupId}")
-    public List<ChatGroup> findGroupById(@PathVariable String groupId) {
-        return null;
+    public ChatGroup findGroupById(@PathVariable String groupId) {
+        return chatService.findGroupById(groupId);
     }
 }

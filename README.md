@@ -42,7 +42,6 @@ curl --location --request POST 'http://${SERVER_ADDRESS}/chats/groups' \
   {
     "id": "945dc3ee",
     "num": 3,
-    "original": null,
     "lang": "ja",
     "text": "こんにちは",
     "type": "TALK",
@@ -50,10 +49,10 @@ curl --location --request POST 'http://${SERVER_ADDRESS}/chats/groups' \
     "sender": {
       "name": "Shirai"
     },
-    "translation": [
+    "translations": [
       {
         "lang": "en",
-        "text": "Hi, I am Shirai"
+        "text": "Hi, I am Shirai."
       }
     ]
   }

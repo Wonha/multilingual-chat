@@ -16,8 +16,8 @@ curl --location --request POST 'http://${SERVER_ADDRESS}/chats/groups' \
 	"type": "ENTER",
 	"text": "",
 	"sender": {
-		"name": "wonha",
-        "lang": "ko"
+		"name": "白井",
+        "lang": "ja"
 	},
 	"groupId": "${GROUP_ID}"
 }
@@ -27,11 +27,11 @@ curl --location --request POST 'http://${SERVER_ADDRESS}/chats/groups' \
 ```json
 {
 	"type": "TALK",
-	"text": "안녕하세요",
+	"text": "こんにちは。白井です。",
 	"sender": {
-		"name": "Wonha",
-        "lang": "ko"
+		"name": "白井",
+        "lang": "ja"
 	},
-	"groupId": "${GROUP_ID"
+	"groupId": "${GROUP_ID}"
 }
 ```

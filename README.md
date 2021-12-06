@@ -35,3 +35,27 @@ curl --location --request POST 'http://${SERVER_ADDRESS}/chats/groups' \
 	"groupId": "${GROUP_ID}"
 }
 ```
+
+レスポンスの例（ユーザーの言語選択が en の場合）：
+```json
+[
+  {
+    "id": "945dc3ee",
+    "num": 3,
+    "original": null,
+    "lang": "ja",
+    "text": "こんにちは",
+    "type": "TALK",
+    "createdAt": "2021-12-05T16:22:21.533246Z",
+    "sender": {
+      "name": "Shirai"
+    },
+    "translation": [
+      {
+        "lang": "en",
+        "text": "Hi, I am Shirai"
+      }
+    ]
+  }
+]
+```

@@ -37,7 +37,6 @@ public class MessageService {
         // Detect original language
         List<CompletableFuture<Void>> completableFutures = new ArrayList<>();
         MessageWithLanguage original = MessageWithLanguage.builder().text(message.getText()).build();
-//        original.setOriginal(true);
         CompletableFuture<Void> detection = translationClient.detectLanguage(message.getText())
                 .thenAccept(original::setLang);
         completableFutures.add(detection);

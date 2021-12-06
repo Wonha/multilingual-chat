@@ -58,3 +58,8 @@ curl --location --request POST 'http://${SERVER_ADDRESS}/chats/groups' \
   }
 ]
 ```
+
+サーバーの Chat Group 一覧をみる。
+```shell
+curl --location --request GET 'http://${SERVER_ADDRESS}/chats/groups
+```

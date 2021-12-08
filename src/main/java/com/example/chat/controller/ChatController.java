@@ -27,4 +27,9 @@ public class ChatController {
     public ChatGroup findGroupById(@PathVariable String groupId) {
         return this.chatService.findGroupById(groupId);
     }
+
+    @DeleteMapping("/chats/groups/{groupId}")
+    public ChatGroup deleteGroupById(@PathVariable String groupId) {
+        return this.chatService.deleteGroupById(groupId);
+    }
 }

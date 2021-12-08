@@ -49,9 +49,20 @@ public class GroupService {
     public void exitGroup(ChatGroup group, User sender) {
         group.getUsers().remove(sender);
         if (group.hasNoUser()) {
-            this.groupRepository.remove(group.getId());
+            this.groupRepository.removeById(group.getId());
         }
         this.sessionRepository.remove(sender.getWebSocketSession().getId());
     }
 
+    public ChatGroup deleteGroupById(String groupId) {
+        ChatGroup group = this.groupRepository.findGroupById(groupId);
+        if (null == group) {
+            return null;
+        }
+
+        group.getUsers().forEach(u ->
+                this.sessionRepository.remove(u.getWebSocketSession().getId()));
+        this.groupRepository.removeById(groupId);
+        return group;
+    }
 }

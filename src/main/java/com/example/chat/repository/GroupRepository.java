@@ -25,7 +25,7 @@ public class GroupRepository {
         return group;
     }
 
-    public void remove(String id) {
+    public void removeById(String id) {
         this.groupId2Group.remove(id);
     }
 }

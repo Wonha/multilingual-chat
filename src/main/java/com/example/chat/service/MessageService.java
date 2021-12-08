@@ -26,7 +26,7 @@ public class MessageService {
     private final MessageRepository messageRepository;
 
     public void handleMessage(WebSocketSession session, Message message) {
-        ChatGroup group = groupService.findGroupById(message.getGroupId());
+        ChatGroup group = this.groupService.findGroupById(message.getGroupId());
         if (null == group) {
             sendMessage(session, "Chat group not exist " + message.getGroupId());
             return;
@@ -37,7 +37,7 @@ public class MessageService {
         // Detect original language
         List<CompletableFuture<Void>> completableFutures = new ArrayList<>();
         MessageWithLanguage original = MessageWithLanguage.builder().text(message.getText()).build();
-        CompletableFuture<Void> detection = translationClient.detectLanguage(message.getText())
+        CompletableFuture<Void> detection = this.translationClient.detectLanguage(message.getText())
                 .thenAccept(original::setLang);
         completableFutures.add(detection);
 
@@ -50,7 +50,7 @@ public class MessageService {
 
         lang2Translation.put(original.getLang(), original);
         message.setTranslatedMessage(new HashSet<>(lang2Translation.values()));
-        messageRepository.save(message);
+        this.messageRepository.save(message);
 
         // Send translations to users in group
         group.getUsers().forEach(u -> {
@@ -83,7 +83,7 @@ public class MessageService {
         String senderName;
         switch (message.getType()) {
             case ENTER:
-                groupService.enterGroup(group, message.getSender());
+                this.groupService.enterGroup(group, message.getSender());
                 senderName = message.getSender().getName();
                 message.setSender(User.newSystemUser(message.getSender().getLang()));
                 message.setText(senderName + " has joined");
@@ -91,7 +91,7 @@ public class MessageService {
             case TALK:
                 break;
             case EXIT:
-                groupService.exitGroup(group, message.getSender());
+                this.groupService.exitGroup(group, message.getSender());
                 senderName = message.getSender().getName();
                 message.setSender(User.newSystemUser(message.getSender().getLang()));
                 message.setText(senderName + " has left");
@@ -104,7 +104,7 @@ public class MessageService {
         return targetLanguages.stream()
                 .collect(Collectors.toMap(Function.identity(), (lang -> {
                     MessageWithLanguage translated = MessageWithLanguage.builder().lang(lang).build();
-                    CompletableFuture<Void> c = translationClient
+                    CompletableFuture<Void> c = this.translationClient
                             .translate(text, translated.getLang())
                             .thenAccept(translated::setText);
                     cList.add(c);
@@ -113,7 +113,7 @@ public class MessageService {
     }
 
     public Message newExitMessageOf(String sessionId) {
-        ChatGroup group = groupService.findGroupBySessionId(sessionId);
+        ChatGroup group = this.groupService.findGroupBySessionId(sessionId);
         User sender = null;
         for (User u : group.getUsers()) {
             if (u.getWebSocketSession().getId().equals(sessionId)) {
@@ -130,7 +130,7 @@ public class MessageService {
     private <T> void sendMessage(WebSocketSession session, T message) {
         try {
             log.debug("Response {}", message);
-            session.sendMessage(new TextMessage(objectMapper.writeValueAsString(message)));
+            session.sendMessage(new TextMessage(this.objectMapper.writeValueAsString(message)));
         } catch (IOException e) {
             log.error(e.getMessage(), e);
         }

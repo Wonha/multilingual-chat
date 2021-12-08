@@ -14,16 +14,16 @@ public class ChatController {
 
     @PostMapping("/chats/groups")
     public ChatGroup createGroup(@RequestParam String name) {
-        return chatService.createGroup(name);
+        return this.chatService.createGroup(name);
     }
 
     @GetMapping("/chats/groups")
     public List<ChatGroup> findAllGroups() {
-        return chatService.findAllGroups();
+        return this.chatService.findAllGroups();
     }
 
     @GetMapping("/chats/groups/{groupId}")
     public ChatGroup findGroupById(@PathVariable String groupId) {
-        return chatService.findGroupById(groupId);
+        return this.chatService.findGroupById(groupId);
     }
 }

@@ -30,7 +30,7 @@ public class ChatGroup {
                 .collect(Collectors.toSet());
     }
 
-    public boolean isEmpty() {
+    public boolean hasNoUser() {
         return this.getUsers().size() <= 0;
     }
 

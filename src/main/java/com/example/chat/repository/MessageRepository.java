@@ -11,7 +11,7 @@ public class MessageRepository {
     private Map<String, Message> id2Message = new HashMap<>();
 
     public String save(Message message) {
-        id2Message.put(message.getId(), message);
+        this.id2Message.put(message.getId(), message);
         return message.getId();
     }
 }

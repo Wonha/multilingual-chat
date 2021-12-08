@@ -22,7 +22,7 @@ public class TranslationClient {
     @Async(TRANSLATION_THREAD_POOL)
     public CompletableFuture<String> translate(String text, String preferredLanguage) {
         try (TranslationServiceClient client = TranslationServiceClient.create()) {
-            LocationName parent = LocationName.of(gcpConfig.getProjectId(), "global");
+            LocationName parent = LocationName.of(this.gcpConfig.getProjectId(), "global");
 
             TranslateTextRequest request =
                     TranslateTextRequest.newBuilder()
@@ -49,7 +49,7 @@ public class TranslationClient {
     @Async(TRANSLATION_THREAD_POOL)
     public CompletableFuture<String> detectLanguage(String text) {
         try (TranslationServiceClient client = TranslationServiceClient.create()) {
-            LocationName parent = LocationName.of(gcpConfig.getProjectId(), "global");
+            LocationName parent = LocationName.of(this.gcpConfig.getProjectId(), "global");
 
             DetectLanguageRequest request =
                     DetectLanguageRequest.newBuilder()

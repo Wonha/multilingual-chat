@@ -13,19 +13,19 @@ public class GroupRepository {
     private Map<String, ChatGroup> groupId2Group = new HashMap<>();
 
     public List<ChatGroup> findAll() {
-        return new ArrayList<>(groupId2Group.values());
+        return new ArrayList<>(this.groupId2Group.values());
     }
 
     public ChatGroup findGroupById(String id) {
-        return groupId2Group.get(id);
+        return this.groupId2Group.get(id);
     }
 
     public ChatGroup save(ChatGroup group) {
-        groupId2Group.put(group.getId(), group);
+        this.groupId2Group.put(group.getId(), group);
         return group;
     }
 
     public void remove(String id) {
-        groupId2Group.remove(id);
+        this.groupId2Group.remove(id);
     }
 }

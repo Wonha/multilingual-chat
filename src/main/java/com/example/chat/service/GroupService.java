@@ -19,11 +19,11 @@ public class GroupService {
     private final SessionRepository sessionRepository;
 
     public List<ChatGroup> findAllGroups() {
-        return groupRepository.findAll();
+        return this.groupRepository.findAll();
     }
 
     public ChatGroup findGroupById(String id) {
-        return groupRepository.findGroupById(id);
+        return this.groupRepository.findGroupById(id);
     }
 
     public ChatGroup createGroup(String name) {
@@ -32,26 +32,26 @@ public class GroupService {
                 .id(newId)
                 .name(name)
                 .build();
-        groupRepository.save(newGroup);
+        this.groupRepository.save(newGroup);
         return newGroup;
     }
 
     public void enterGroup(ChatGroup group, User sender) {
         group.getUsers().add(sender);
-        groupRepository.save(group);
-        sessionRepository.save(group.getId(), sender.getWebSocketSession());
+        this.groupRepository.save(group);
+        this.sessionRepository.save(group.getId(), sender.getWebSocketSession());
     }
 
     public ChatGroup findGroupBySessionId(String sessionId) {
-        return groupRepository.findGroupById(sessionRepository.findGroupBySessionId(sessionId));
+        return this.groupRepository.findGroupById(this.sessionRepository.findGroupBySessionId(sessionId));
     }
 
     public void exitGroup(ChatGroup group, User sender) {
         group.getUsers().remove(sender);
-        if (group.isEmpty()) {
-            groupRepository.remove(group.getId());
+        if (group.hasNoUser()) {
+            this.groupRepository.remove(group.getId());
         }
-        sessionRepository.remove(sender.getWebSocketSession().getId());
+        this.sessionRepository.remove(sender.getWebSocketSession().getId());
     }
 
 }

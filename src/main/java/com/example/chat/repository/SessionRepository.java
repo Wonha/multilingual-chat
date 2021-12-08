@@ -11,14 +11,14 @@ public class SessionRepository {
     private Map<String, String> session2GroupId = new HashMap<>();
 
     public void save(String groupId, WebSocketSession webSocketSession) {
-        session2GroupId.put(webSocketSession.getId(), groupId);
+        this.session2GroupId.put(webSocketSession.getId(), groupId);
     }
 
     public void remove(String sessionId) {
-        session2GroupId.remove(sessionId);
+        this.session2GroupId.remove(sessionId);
     }
 
     public String findGroupBySessionId(String sessionId) {
-        return session2GroupId.getOrDefault(sessionId, "");
+        return this.session2GroupId.getOrDefault(sessionId, "");
     }
 }

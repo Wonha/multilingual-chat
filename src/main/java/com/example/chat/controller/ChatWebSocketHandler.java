@@ -22,16 +22,16 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         String payload = message.getPayload();
         log.debug("New message: {}", payload);
-        Message newMessage = objectMapper.readValue(payload, Message.class);
+        Message newMessage = this.objectMapper.readValue(payload, Message.class);
         newMessage.getSender().setWebSocketSession(session);
-        messageService.handleMessage(session, newMessage);
+        this.messageService.handleMessage(session, newMessage);
     }
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
         log.debug("Session closed: {}", session);
-        Message message = messageService.newExitMessageOf(session.getId());
-        messageService.handleMessage(session, message);
+        Message message = this.messageService.newExitMessageOf(session.getId());
+        this.messageService.handleMessage(session, message);
     }
 
 }

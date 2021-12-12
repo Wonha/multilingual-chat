@@ -67,7 +67,7 @@ public class MessageService {
                     .lang(original.getLang())
                     .text(original.getText())
                     .type(message.getType())
-                    .sender(message.getSender().getName())
+                    .sender(message.getSender())
                     .createdAt(message.getCreatedAt())
                     .translations(translation)
                     .build();

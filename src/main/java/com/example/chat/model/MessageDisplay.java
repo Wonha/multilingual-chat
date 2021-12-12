@@ -15,7 +15,7 @@ public class MessageDisplay {
     private String text;
     private Message.Type type;
     private String createdAt;
-    private String sender;
+    private User sender;
     private Set<MessageWithLanguage> translations;
 
     @Builder
@@ -26,7 +26,7 @@ public class MessageDisplay {
             String text,
             Message.Type type,
             String createdAt,
-            String sender,
+            User sender,
             Set<MessageWithLanguage> translations) {
         this.id = id;
         this.num = num;

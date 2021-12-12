@@ -17,7 +17,6 @@ public class User {
 
     private String name;
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String photoUrl;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)

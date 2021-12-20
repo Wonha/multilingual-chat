@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 @Setter
 @EqualsAndHashCode(of = "id")
 public class ChatGroup {
+
     private String id;
     private String name;
     private int messageNum;

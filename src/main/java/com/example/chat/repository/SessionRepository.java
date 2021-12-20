@@ -12,10 +12,10 @@ import java.util.stream.Collectors;
 @Repository
 public class SessionRepository {
     private Map<String, ChatSession> sessionId2ChatSession = new HashMap<>();
-    private Map<String, String> groupUser2SessionId = new HashMap<>();
+    private Map<String, String> groupUserId2SessionId = new HashMap<>();
 
     public void save(WebSocketSession session, String groupId, String userId) {
-        this.groupUser2SessionId.put(toGroupUserId(groupId, userId), session.getId());
+        this.groupUserId2SessionId.put(toGroupUserId(groupId, userId), session.getId());
         this.sessionId2ChatSession.put(
                 session.getId(),
                 ChatSession.builder()
@@ -25,14 +25,9 @@ public class SessionRepository {
                         .build());
     }
 
-    private String toGroupUserId(String groupId, String userId) {
-        return groupId + userId;
-    }
-
     public void removeById(String sessionId) {
         ChatSession chatSession = findById(sessionId);
-        this.groupUser2SessionId.remove(
-                toGroupUserId(chatSession.getGroupId(), chatSession.getUserId()));
+        this.groupUserId2SessionId.remove(toGroupUserId(chatSession.getGroupId(), chatSession.getUserId()));
         this.sessionId2ChatSession.remove(sessionId);
     }
 
@@ -57,11 +52,11 @@ public class SessionRepository {
                 .collect(Collectors.toSet());
         sessions.forEach(this.sessionId2ChatSession::remove);
 
-        Set<String> groupUsers = groupUser2SessionId.entrySet().stream()
+        Set<String> groupUsers = groupUserId2SessionId.entrySet().stream()
                 .filter(e -> sessions.contains(e.getValue()))
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toSet());
-        groupUsers.forEach(this.groupUser2SessionId::remove);
+        groupUsers.forEach(this.groupUserId2SessionId::remove);
     }
 
     public ChatSession findByGroupUser(String groupId, String userId) {
@@ -69,6 +64,11 @@ public class SessionRepository {
     }
 
     private ChatSession findByGroupUserId(String groupUserId) {
-        return findById(this.groupUser2SessionId.get(groupUserId));
+        return findById(this.groupUserId2SessionId.get(groupUserId));
     }
+
+    private String toGroupUserId(String groupId, String userId) {
+        return groupId + userId;
+    }
+
 }

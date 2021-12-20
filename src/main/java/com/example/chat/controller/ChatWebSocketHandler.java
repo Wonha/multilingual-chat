@@ -1,6 +1,5 @@
 package com.example.chat.controller;
 
-import com.example.chat.domain.Message;
 import com.example.chat.model.MessageRequest;
 import com.example.chat.service.MessageService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,6 +15,7 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 @Component
 @RequiredArgsConstructor
 public class ChatWebSocketHandler extends TextWebSocketHandler {
+
     private final ObjectMapper objectMapper;
     private final MessageService messageService;
 

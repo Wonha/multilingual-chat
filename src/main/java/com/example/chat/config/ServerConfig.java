@@ -9,7 +9,11 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @Getter
 @EnableAsync
 public class ServerConfig {
+
     public final String uriTranslationApi;
+
+    public static final String SYSTEM_NAME = "System";
+    public static final String SYSTEM_LANG = "en";
 
     public ServerConfig(
             @Value("${translation.uri}") String uriTranslationApi) {

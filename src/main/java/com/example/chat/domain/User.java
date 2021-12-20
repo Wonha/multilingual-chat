@@ -1,11 +1,10 @@
 package com.example.chat.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.example.chat.config.ServerConfig;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.web.socket.WebSocketSession;
 
 import java.util.Set;
 
@@ -24,8 +23,8 @@ public class User {
 
     public static User newSystemUser() {
         User user = new User();
-        user.setName("System");
-        user.setLang("en");
+        user.setName(ServerConfig.SYSTEM_NAME);
+        user.setLang(ServerConfig.SYSTEM_LANG);
         return user;
     }
 }

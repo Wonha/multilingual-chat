@@ -10,22 +10,23 @@ import java.util.Map;
 
 @Repository
 public class GroupRepository {
-    private Map<String, ChatGroup> groupId2Group = new HashMap<>();
+
+    private Map<String, ChatGroup> id2Group = new HashMap<>();
 
     public List<ChatGroup> findAll() {
-        return new ArrayList<>(this.groupId2Group.values());
+        return new ArrayList<>(this.id2Group.values());
     }
 
     public ChatGroup findById(String id) {
-        return this.groupId2Group.get(id);
+        return this.id2Group.get(id);
     }
 
     public ChatGroup save(ChatGroup group) {
-        this.groupId2Group.put(group.getId(), group);
+        this.id2Group.put(group.getId(), group);
         return group;
     }
 
     public void removeById(String id) {
-        this.groupId2Group.remove(id);
+        this.id2Group.remove(id);
     }
 }

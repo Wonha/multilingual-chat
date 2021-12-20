@@ -4,14 +4,13 @@ import com.example.chat.model.MessageRequest;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
+import java.time.Instant;
 import java.util.Set;
 import java.util.UUID;
 
-@Getter
-@Setter
-@ToString
+@Data
 @EqualsAndHashCode(of = "id")
-@NoArgsConstructor
+@Builder
 public class Message {
 
     private String id;
@@ -22,33 +21,24 @@ public class Message {
     private String createdAt;
     private String text;
     private String detectedLanguage;
-    private Set<MessageWithLanguage> translatedMessage;
+    private Set<Translation> translatedMessage;
     @JsonIgnore
     private String disruptiveScore;
-
-    @Builder
-    public Message(Type type, String groupId, User sender) {
-        this.type = type;
-        this.groupId = groupId;
-        this.sender = sender;
-    }
 
     public enum Type {
         ENTER, TALK, EXIT
     }
 
-    public static Message newMessageOf(MessageRequest messageRequest, int messageNum) {
-        Message message = new Message();
-
-        message.setId(UUID.randomUUID().toString());
-        message.setNum(messageNum);
-        message.setCreatedAt(java.time.Instant.now().toString());
-
-        message.setType(messageRequest.getType());
-        message.setGroupId(messageRequest.getGroupId());
-        message.setSender(messageRequest.getSender());
-        message.setText(messageRequest.getText());
-        return message;
+    public static Message of(MessageRequest messageRequest, int messageNum) {
+        return Message.builder()
+                .id(UUID.randomUUID().toString())
+                .num(messageNum)
+                .type(messageRequest.getType())
+                .groupId(messageRequest.getGroupId())
+                .sender(messageRequest.getSender())
+                .createdAt(Instant.now().toString())
+                .text(messageRequest.getText())
+                .build();
     }
 
 }

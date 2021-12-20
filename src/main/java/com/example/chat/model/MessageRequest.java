@@ -11,6 +11,7 @@ import lombok.ToString;
 @Setter
 @ToString
 public class MessageRequest {
+
     private Message.Type type;
     private String groupId;
     private User sender;

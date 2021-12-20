@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @Getter
 public class GcpConfig {
+
     public final String projectId;
 
     public GcpConfig(

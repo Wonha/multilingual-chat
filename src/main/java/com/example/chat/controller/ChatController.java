@@ -12,6 +12,7 @@ import java.util.List;
 @CrossOrigin
 @RestController
 public class ChatController {
+
     private final GroupService groupService;
     private final MessageService messageService;
 

@@ -14,6 +14,7 @@ import java.util.concurrent.Executor;
 @EnableAsync
 @Getter
 public class AsyncConfig {
+
     private final int mainPoolCoreSize;
     private final int mainPoolMaxSize;
     private final int mainPoolQueueSize;

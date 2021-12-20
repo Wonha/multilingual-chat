@@ -1,5 +1,6 @@
-package com.example.chat.model;
+package com.example.chat.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -11,10 +12,13 @@ import lombok.Setter;
 public class MessageWithLanguage {
     private String lang;
     private String text;
+    @JsonIgnore
+    private boolean isOriginal;
 
     @Builder
-    public MessageWithLanguage(String lang, String text) {
+    public MessageWithLanguage(String lang, String text, boolean isOriginal) {
         this.lang = lang;
         this.text = text;
+        this.isOriginal = isOriginal;
     }
 }

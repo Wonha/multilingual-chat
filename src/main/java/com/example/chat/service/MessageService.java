@@ -1,8 +1,11 @@
 package com.example.chat.service;
 
 import com.example.chat.client.TranslationClient;
-import com.example.chat.model.*;
+import com.example.chat.domain.*;
+import com.example.chat.model.MessageDisplay;
+import com.example.chat.model.MessageRequest;
 import com.example.chat.repository.MessageRepository;
+import com.example.chat.repository.SessionRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,31 +23,58 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Service
 public class MessageService {
-    private final ObjectMapper objectMapper;
     private final TranslationClient translationClient;
     private final GroupService groupService;
     private final MessageRepository messageRepository;
+    private final SessionRepository sessionRepository;
 
-    public void handleMessage(WebSocketSession session, Message message) {
-        ChatGroup group = this.groupService.findGroupById(message.getGroupId());
+    private final ObjectMapper objectMapper;
+
+    public MessageRequest newExitMessageOf(String sessionId) {
+        ChatGroup group = this.groupService.findById(
+                this.sessionRepository.findGroupIdBySessionId(sessionId));
+        String userId = this.sessionRepository.findUserIdBySessionId(sessionId);
+
+        User sender = null;
+        for (User u : group.getUsers()) {
+            if (u.getId().equals(userId)) {
+                sender = u;
+            }
+        }
+
+        return MessageRequest.builder()
+                .type(Message.Type.EXIT)
+                .groupId(group.getId())
+                .sender(sender)
+                .build();
+    }
+
+    public void handleMessage(WebSocketSession session, MessageRequest messageRequest) {
+        ChatGroup group = this.groupService.findById(messageRequest.getGroupId());
         if (null == group) {
-            sendMessage(session, "Chat group not exist " + message.getGroupId());
+            sendMessage(session, "Chat group not exist " + messageRequest.getGroupId());
             return;
         }
 
-        processMessageType(message, group);
+        Message message = processMessageType(messageRequest, session, group);
+
+        List<CompletableFuture<Void>> completableFutures = new ArrayList<>();
 
         // Detect original language
-        List<CompletableFuture<Void>> completableFutures = new ArrayList<>();
-        MessageWithLanguage original = MessageWithLanguage.builder().text(message.getText()).build();
+        MessageWithLanguage original = MessageWithLanguage.builder()
+                .text(message.getText())
+                .isOriginal(true)
+                .build();
         CompletableFuture<Void> detection = this.translationClient.detectLanguage(message.getText())
                 .thenAccept(original::setLang);
+
         completableFutures.add(detection);
 
         // Create translations in target language
         Map<String, MessageWithLanguage> lang2Translation = createTranslations(message.getText(),
                 group.findPreferredLanguages(),
                 completableFutures);
+
         completableFutures.forEach(CompletableFuture::join);
         log.debug("Completion <<");
 
@@ -72,32 +102,34 @@ public class MessageService {
                     .translations(translation)
                     .build();
             display.add(latestMessage);
-            sendMessage(u.getWebSocketSession(), display);
+            sendMessage(sessionRepository.findByGroupUser(group.getId(), u.getId()).getSession(), display);
         });
     }
 
-    private void processMessageType(Message message, ChatGroup group) {
-        message.setId(UUID.randomUUID().toString());
-        message.setNum(group.increaseAndGetMessageNum());
-        message.setCreatedAt(java.time.Instant.now().toString());
-        String senderName;
+    private Message processMessageType(MessageRequest messageRequest, WebSocketSession session, ChatGroup group) {
+        Message message = Message.newMessageOf(messageRequest, group.increaseAndGetMessageNum());
+
         switch (message.getType()) {
             case ENTER:
+                this.sessionRepository.save(session, group.getId(), message.getSender().getId());
                 this.groupService.enterGroup(group, message.getSender());
-                senderName = message.getSender().getName();
-                message.setSender(User.newSystemUser(message.getSender().getLang()));
-                message.setText(senderName + " has joined");
+                overrideSystemMessage(message, " has joined");
                 break;
             case TALK:
                 break;
             case EXIT:
+                this.sessionRepository.removeById(session.getId());
                 this.groupService.exitGroup(group, message.getSender());
-                senderName = message.getSender().getName();
-                message.setSender(User.newSystemUser(message.getSender().getLang()));
-                message.setText(senderName + " has left");
+                overrideSystemMessage(message, " has left");
                 break;
             default:
         }
+        return message;
+    }
+
+    private void overrideSystemMessage(Message message, String text) {
+        message.setText(message.getSender().getName() + text);
+        message.setSender(User.newSystemUser());
     }
 
     private Map<String, MessageWithLanguage> createTranslations(String text, Set<String> targetLanguages, List<CompletableFuture<Void>> cList) {
@@ -112,21 +144,6 @@ public class MessageService {
                 })));
     }
 
-    public Message newExitMessageOf(String sessionId) {
-        ChatGroup group = this.groupService.findGroupBySessionId(sessionId);
-        User sender = null;
-        for (User u : group.getUsers()) {
-            if (u.getWebSocketSession().getId().equals(sessionId)) {
-                sender = u;
-            }
-        }
-        return Message.builder()
-                .type(Message.Type.EXIT)
-                .groupId(group.getId())
-                .sender(sender)
-                .build();
-    }
-
     private <T> void sendMessage(WebSocketSession session, T message) {
         try {
             log.debug("Response {}", message);
@@ -136,4 +153,8 @@ public class MessageService {
         }
     }
 
+    public ChatGroup deleteGroupById(String groupId) {
+        this.sessionRepository.removeByGroupId(groupId);
+        return this.groupService.deleteGroupById(groupId);
+    }
 }

@@ -1,6 +1,6 @@
 package com.example.chat.repository;
 
-import com.example.chat.model.ChatGroup;
+import com.example.chat.domain.ChatGroup;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ public class GroupRepository {
         return new ArrayList<>(this.groupId2Group.values());
     }
 
-    public ChatGroup findGroupById(String id) {
+    public ChatGroup findById(String id) {
         return this.groupId2Group.get(id);
     }
 

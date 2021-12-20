@@ -1,6 +1,7 @@
 package com.example.chat.controller;
 
-import com.example.chat.model.Message;
+import com.example.chat.domain.Message;
+import com.example.chat.model.MessageRequest;
 import com.example.chat.service.MessageService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -22,16 +23,15 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         String payload = message.getPayload();
         log.debug("New message: {}", payload);
-        Message newMessage = this.objectMapper.readValue(payload, Message.class);
-        newMessage.getSender().setWebSocketSession(session);
-        this.messageService.handleMessage(session, newMessage);
+        MessageRequest messageRequest = this.objectMapper.readValue(payload, MessageRequest.class);
+        this.messageService.handleMessage(session, messageRequest);
     }
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
         log.debug("Session closed: {}", session);
-        Message message = this.messageService.newExitMessageOf(session.getId());
-        this.messageService.handleMessage(session, message);
+        MessageRequest messageRequest = this.messageService.newExitMessageOf(session.getId());
+        this.messageService.handleMessage(session, messageRequest);
     }
 
 }

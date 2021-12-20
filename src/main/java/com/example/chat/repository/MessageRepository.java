@@ -1,6 +1,6 @@
 package com.example.chat.repository;
 
-import com.example.chat.model.Message;
+import com.example.chat.domain.Message;
 import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;

@@ -1,5 +1,8 @@
 package com.example.chat.model;
 
+import com.example.chat.domain.Message;
+import com.example.chat.domain.MessageWithLanguage;
+import com.example.chat.domain.User;
 import lombok.*;
 
 import java.util.Set;
@@ -7,7 +10,6 @@ import java.util.Set;
 @Getter
 @Setter
 @ToString
-@EqualsAndHashCode(of = "id")
 public class MessageDisplay {
     private String id;
     private int num;

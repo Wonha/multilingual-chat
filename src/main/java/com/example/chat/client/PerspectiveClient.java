@@ -29,8 +29,8 @@ public class PerspectiveClient {
         this.perspectiveUri = perspectiveUri;
     }
 
-    public Perspective perspective(String text) {
-        HttpEntity<PerspectiveRequest> request = new HttpEntity<>(new PerspectiveRequest(text));
+    public Perspective perspective(String text, String lang) {
+        HttpEntity<PerspectiveRequest> request = new HttpEntity<>(new PerspectiveRequest(text, lang));
         final URI uri = restTemplate.getUriTemplateHandler().expand(this.perspectiveUri, perspectiveKey);
 
         ResponseEntity<Perspective> response = this.restTemplate.postForEntity(uri, request, Perspective.class);

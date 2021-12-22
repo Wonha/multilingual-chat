@@ -80,7 +80,7 @@ public class MessageService {
                             .translate(text, translated.getLang())
                             .thenApply(t -> {
                                 translated.setText(t);
-                                return this.perspectiveClient.perspective(t);
+                                return this.perspectiveClient.perspective(t, lang);
                             })
                             .thenAccept(p -> translated.detoxifyText(p.getSummaryScore(),
                                     serverConfig.toxicityThreshold));
@@ -99,7 +99,7 @@ public class MessageService {
         CompletableFuture<Void> future = this.translationClient.detectLanguage(text)
                 .thenApply(l -> {
                     original.setLang(l);
-                    return this.perspectiveClient.perspective(original.getText());
+                    return this.perspectiveClient.perspective(original.getText(), l);
                 })
                 .thenAccept(p -> original.detoxifyText(p.getSummaryScore(),
                         serverConfig.toxicityThreshold));

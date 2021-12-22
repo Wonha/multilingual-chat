@@ -23,6 +23,11 @@ spec:
             # Remove this to disable the debug build.
             - name: JAVA_TOOL_OPTIONS
               value: -agentlib:jdwp=transport=dt_socket,server=y,address=5005,suspend=n,quiet=y
+            - name: PERSPECTIVE_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: perspective-secret
+                  key: apiKey
           readinessProbe:
             tcpSocket:
               port: 8080

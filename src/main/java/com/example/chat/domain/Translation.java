@@ -1,10 +1,11 @@
 package com.example.chat.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.math.BigDecimal;
 
 @Getter
 @Setter
@@ -14,6 +15,14 @@ public class Translation {
 
     private String lang;
     private String text;
-    @JsonIgnore
     private boolean isOriginal;
+    private BigDecimal toxicityScore;
+
+    public void detoxifyText(BigDecimal toxicityScore, BigDecimal toxicityThreshold) {
+        this.toxicityScore = toxicityScore;
+        if (toxicityScore.compareTo(toxicityThreshold) >= 1) {
+            this.setText("Antidote required: " + this.getText());
+        }
+    }
+
 }

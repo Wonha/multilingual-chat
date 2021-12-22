@@ -5,21 +5,22 @@ import com.google.cloud.translate.v3.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
-import static com.example.chat.config.AsyncConfig.TRANSLATION_THREAD_POOL;
+import static com.example.chat.config.AsyncConfig.ASYNC_CLIENT_THREAD_POOL;
 
 @Slf4j
-@Service
+@Component
 @RequiredArgsConstructor
 public class TranslationClient {
+
     private final GcpConfig gcpConfig;
 
-    @Async(TRANSLATION_THREAD_POOL)
+    @Async(ASYNC_CLIENT_THREAD_POOL)
     public CompletableFuture<String> translate(String text, String preferredLanguage) {
         try (TranslationServiceClient client = TranslationServiceClient.create()) {
             LocationName parent = LocationName.of(this.gcpConfig.getProjectId(), "global");
@@ -41,12 +42,12 @@ public class TranslationClient {
                             .collect(Collectors.joining()));
 
         } catch (IOException e) {
-            log.warn("Translation failed {}", e);
+            log.error("Translation failed {}", e);
             return CompletableFuture.completedFuture("");
         }
     }
 
-    @Async(TRANSLATION_THREAD_POOL)
+    @Async(ASYNC_CLIENT_THREAD_POOL)
     public CompletableFuture<String> detectLanguage(String text) {
         try (TranslationServiceClient client = TranslationServiceClient.create()) {
             LocationName parent = LocationName.of(this.gcpConfig.getProjectId(), "global");
@@ -67,7 +68,7 @@ public class TranslationClient {
                             .map(DetectedLanguage::getLanguageCode)
                             .orElse(""));
         } catch (IOException e) {
-            log.warn("Language Detection failed {}", e);
+            log.error("Language Detection failed {}", e);
             return CompletableFuture.completedFuture("unknown");
         }
     }

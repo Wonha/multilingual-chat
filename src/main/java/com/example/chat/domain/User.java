@@ -6,8 +6,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Set;
-
 @Getter
 @Setter
 @EqualsAndHashCode(of = "id")
@@ -19,7 +17,6 @@ public class User {
     private String photoUrl;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String lang;
-    private Set<String> groups;
 
     public static User newSystemUser() {
         User user = new User();

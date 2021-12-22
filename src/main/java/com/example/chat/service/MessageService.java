@@ -1,6 +1,8 @@
 package com.example.chat.service;
 
+import com.example.chat.client.PerspectiveClient;
 import com.example.chat.client.TranslationClient;
+import com.example.chat.config.ServerConfig;
 import com.example.chat.domain.ChatGroup;
 import com.example.chat.domain.Message;
 import com.example.chat.domain.Translation;
@@ -28,7 +30,9 @@ import java.util.stream.Collectors;
 public class MessageService {
 
     private final TranslationClient translationClient;
+    private final PerspectiveClient perspectiveClient;
     private final GroupService groupService;
+    private final ServerConfig serverConfig;
     private final MessageRepository messageRepository;
     private final SessionRepository sessionRepository;
 
@@ -44,14 +48,14 @@ public class MessageService {
         Message message = processMessageType(messageRequest, session, group);
 
         List<CompletableFuture<Void>> completableFutures = new ArrayList<>();
-        Translation original = detectOriginalLanguageFuture(message, completableFutures);
-        Map<String, Translation> lang2Translation = createTranslationsFuture(message.getText(),
+        Translation original = detectOriginalMessageAntidote(message.getText(), completableFutures);
+        Map<String, Translation> lang2Translations = detectTranslationsAntidote(message.getText(),
                 group.findPreferredLanguages(), completableFutures);
         completableFutures.forEach(CompletableFuture::join);
+        lang2Translations.put(original.getLang(), original);
         log.debug("Completion <<");
 
-        lang2Translation.put(original.getLang(), original);
-        message.setTranslatedMessage(new HashSet<>(lang2Translation.values()));
+        message.setTranslatedMessage(new HashSet<>(lang2Translations.values()));
         this.messageRepository.save(message);
 
         // Send message to users in group
@@ -60,39 +64,48 @@ public class MessageService {
         display.add(latestMessageDisplay);
         group.getUsers().forEach(u -> {
             Set<Translation> userTranslations = new HashSet<>();
-            if (!original.getText().equals(u.getLang())) {
-                userTranslations.add(lang2Translation.get(u.getLang()));
-            }
+            userTranslations.add(lang2Translations.get(u.getLang()));
             latestMessageDisplay.setTranslations(userTranslations);
             sendMessage(sessionRepository.findByGroupUser(group.getId(), u.getId()).getSession(), display);
         });
     }
 
-    private Translation detectOriginalLanguageFuture(
-            Message message, List<CompletableFuture<Void>> completableFutures) {
-        Translation original = Translation.builder()
-                .text(message.getText())
-                .isOriginal(true)
-                .build();
-        CompletableFuture<Void> detection = this.translationClient.detectLanguage(message.getText())
-                .thenAccept(original::setLang);
-        completableFutures.add(detection);
-        return original;
-    }
-
-    private Map<String, Translation> createTranslationsFuture(
+    private Map<String, Translation> detectTranslationsAntidote(
             String text, Set<String> targetLanguages, List<CompletableFuture<Void>> cList) {
+
         return targetLanguages.stream()
                 .collect(Collectors.toMap(Function.identity(), (lang -> {
                     Translation translated = Translation.builder().lang(lang).build();
-                    CompletableFuture<Void> c = this.translationClient
+                    CompletableFuture<Void> future = this.translationClient
                             .translate(text, translated.getLang())
-                            .thenAccept(translated::setText);
-                    cList.add(c);
+                            .thenApply(t -> {
+                                translated.setText(t);
+                                return this.perspectiveClient.perspective(t);
+                            })
+                            .thenAccept(p -> translated.detoxifyText(p.getSummaryScore(),
+                                    serverConfig.toxicityThreshold));
+                    cList.add(future);
                     return translated;
                 })));
     }
 
+    private Translation detectOriginalMessageAntidote(
+            String text, List<CompletableFuture<Void>> completableFutures) {
+
+        Translation original = Translation.builder()
+                .text(text)
+                .isOriginal(true)
+                .build();
+        CompletableFuture<Void> future = this.translationClient.detectLanguage(text)
+                .thenApply(l -> {
+                    original.setLang(l);
+                    return this.perspectiveClient.perspective(original.getText());
+                })
+                .thenAccept(p -> original.detoxifyText(p.getSummaryScore(),
+                        serverConfig.toxicityThreshold));
+        completableFutures.add(future);
+        return original;
+    }
 
     public ChatGroup deleteGroupById(String groupId) {
         this.sessionRepository.removeByGroupId(groupId);
@@ -120,7 +133,7 @@ public class MessageService {
 
     private <T> void sendMessage(WebSocketSession session, T message) {
         try {
-            log.debug("Response {}", message);
+            log.debug("Broadcast {}", message);
             session.sendMessage(new TextMessage(this.objectMapper.writeValueAsString(message)));
         } catch (IOException e) {
             log.error(e.getMessage(), e);

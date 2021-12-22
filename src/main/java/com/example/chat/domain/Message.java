@@ -1,8 +1,9 @@
 package com.example.chat.domain;
 
 import com.example.chat.model.MessageRequest;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.*;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.time.Instant;
 import java.util.Set;
@@ -22,8 +23,6 @@ public class Message {
     private String text;
     private String detectedLanguage;
     private Set<Translation> translatedMessage;
-    @JsonIgnore
-    private String disruptiveScore;
 
     public enum Type {
         ENTER, TALK, EXIT

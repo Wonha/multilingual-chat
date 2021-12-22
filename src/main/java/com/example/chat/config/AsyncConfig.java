@@ -20,7 +20,7 @@ public class AsyncConfig {
     private final int mainPoolQueueSize;
     private final String mainPoolPrefix;
 
-    public static final String TRANSLATION_THREAD_POOL = "translation-thread-pool";
+    public static final String ASYNC_CLIENT_THREAD_POOL = "translation-thread-pool";
 
     public AsyncConfig(
             @Value("${thread-pool.main.size.max}") int mainPoolMaxSize,
@@ -33,7 +33,7 @@ public class AsyncConfig {
         this.mainPoolPrefix = mainPoolPrefix;
     }
 
-    @Bean(name = TRANSLATION_THREAD_POOL)
+    @Bean(name = ASYNC_CLIENT_THREAD_POOL)
     public Executor asyncExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(getMainPoolCoreSize());

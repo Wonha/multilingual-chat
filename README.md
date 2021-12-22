@@ -2,18 +2,18 @@
 
 ## Introduction
 Multilingual Chat is a server side application of a chat service.
-It has multilingual translation support and 'antidote' feature - filtering disruptive messages in given language.
+It has multilingual translation support and 'antidote' feature - filtering disruptive messages in a given language.
 
 Translation feature automatically detects 100+ languages and translate according to your preferred language.
-This feature is feasible by using Google Cloud's [Cloud Translation - Advanced API](https://cloud.google.com/translate).
+This is implemented by using Google Cloud's [Cloud Translation - Advanced API](https://cloud.google.com/translate).
 
 Antidote feature filters out toxic messages that offend users. Filtering is based on the degree of toxicity of messages.
-This is all provided by the [Perspective API](https://perspectiveapi.com/), which makes it easier to host better conversations.
-This API also returns [several values](https://support.perspectiveapi.com/s/about-the-api-attributes-and-languages) representing 
-how the message is insulting targeted identity, if the message includes profanity words, and so on.
+The [Perspective API](https://perspectiveapi.com/), which makes it easier to host better conversations is used for this feature.
+This API also returns several [other attributes](https://support.perspectiveapi.com/s/about-the-api-attributes-and-languages) of message, such as 
+whether the message is insulting targeted identity, whether the message includes profanity words, and so on.
 
-To provide near real-time chat user experience, mobile or frontend applications connect to this application using WebSocket.
-Then this application orchestrate dependent APIs call asynchronously and broadcast messages to users in chat group.  
+To provide near real-time chat user experience, mobile or frontend applications connect to this application using WebSocket protocol.  
+This application orchestrate dependent APIs calls asynchronously and broadcast messages to users in chat group.  
 If you want to try this chat service without mobile or frontend application, please check the WebSocket clients at the [Chrome Web Store](https://chrome.google.com/webstore/search/websocket).
 
 
@@ -33,7 +33,7 @@ please follow the setup steps in official [documentation](https://cloud.google.c
 ### Perspective API key
 
 The Perspective API is one of the products of the Conversation AI Initiative, 
-which is being promoted by [Jigsaw](https://jigsaw.google.com/) under Alphabet and 
+which is being promoted by the [Jigsaw](https://jigsaw.google.com/) under Alphabet and 
 the Google Counter-Abuse Technology team.
 
 You can request for the API key [here](https://support.perspectiveapi.com/s/docs-get-started), and try the sample requests.

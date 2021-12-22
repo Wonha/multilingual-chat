@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: chat
+
+logging:
+  level:
+    com.example.*: DEBUG
+
+gcp:
+  project-id: "m10lchat-antidote-demo"
+
+thread-pool:
+  main:
+    prefix: "AsyncClient"
+    size:
+      core: 100
+      max: 100
+      queue: 500
+
+perspective:
+  uri: "https://commentanalyzer.googleapis.com/v1alpha1/comments:analyze?key={key}"
+  threshold:
+    toxicity: 0.75
+  key: ${PERSPECTIVE_API_KEY}

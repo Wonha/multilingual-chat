@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: chat-svc 
+  annotations:
+    cloud.google.com/neg: '{"ingress": true}' 
+    cloud.google.com/backend-config: '{"default": "chat-backendconfig"}'
+spec: 
+  type: ClusterIP
+  selector:
+    app: chat
+  ports:
+  - name: http
+    port: 80 
+    protocol: TCP
+    targetPort: 8080

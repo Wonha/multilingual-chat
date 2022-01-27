@@ -1,0 +1,14 @@
+apiVersion: cloud.google.com/v1
+kind: BackendConfig
+metadata:
+  name: chat-backendconfig
+spec:
+  timeoutSec: 120
+  healthCheck:
+    checkIntervalSec: 30
+    timeoutSec: 20
+    healthyThreshold: 3
+    unhealthyThreshold: 5
+    type: HTTP
+    requestPath: /actuator/health
+    port: 8080

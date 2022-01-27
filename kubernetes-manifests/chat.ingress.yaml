@@ -7,11 +7,6 @@ metadata:
     networking.gke.io/managed-certificates: managed-cert
     kubernetes.io/ingress.class: "gce"
 spec:
-  defaultBackend:
-    service:
-      name: nginx
-      port:
-        number: 80
   rules:
   - host: YOURHOSTNAME
     http:

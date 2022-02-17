@@ -1,0 +1,23 @@
+apiVersion: skaffold/v2beta19
+kind: Config
+build:
+  tagPolicy:
+    sha256: {}
+  artifacts:
+    - image: chat
+      jib:
+        args:
+          - -Dmaven.test.skip=true
+
+deploy:
+  kubectl:
+    manifests:
+      - ./kubernetes-manifests/chat.deployment.yaml
+profiles:
+  - name: cloudbuild
+    build:
+      googleCloudBuild: {}
+  - name: dockerfile
+    build:
+      artifacts:
+        - image: chat

@@ -1,20 +1,19 @@
-# Multilingual Chat
+# Multilingual chat mitigating toxic messages
 
 ## Introduction
-Multilingual Chat is a server side application of a chat service.
-It has multilingual translation support and 'antidote' feature - filtering disruptive messages in a given language.
+This is a server side application of a multilingual chat service which detects and filters toxic messages.
 
-Translation feature automatically detects 100+ languages and translate according to your preferred language.
-This is implemented by using Google Cloud's [Cloud Translation - Advanced API](https://cloud.google.com/translate).
+Multilingual feature automatically detects 100+ languages and translate according to each user's preferred language.
+This is implemented with Google Cloud's [Cloud Translation - Advanced API](https://cloud.google.com/translate).
 
-Antidote feature filters out toxic messages that offend users. Filtering is based on the degree of toxicity of messages.
-The [Perspective API](https://perspectiveapi.com/), which makes it easier to host better conversations is used for this feature.
-This API also returns several [other attributes](https://support.perspectiveapi.com/s/about-the-api-attributes-and-languages) of message, such as 
-whether the message is insulting targeted identity, whether the message includes profanity words, and so on.
+A toxic(or disruptive) message which offend other users can be detected and filtered out based on the degree of toxicity of messages.
+The feature is implemented with [Perspective API](https://perspectiveapi.com/), which makes it easier to host better conversations.  
+The Perspective API also analyze the message and returns several [other attributes](https://support.perspectiveapi.com/s/about-the-api-attributes-and-languages), including 
+whether the message is insulting targeted identity, or the message includes profanity words, and so on.
 
-To provide near real-time chat user experience, mobile or frontend applications connect to this application using WebSocket protocol.  
-This application orchestrate dependent APIs calls asynchronously and broadcast messages to users in chat group.  
-If you want to try this chat service without mobile or frontend application, please check the WebSocket clients at the [Chrome Web Store](https://chrome.google.com/webstore/search/websocket).
+To provide near real-time chat user experience, mobile or frontend applications can connect to this application using WebSocket protocol.  
+This application orchestrate all these dependent APIs calls asynchronously and then broadcast final messages to users in chat group.  
+The [demo frontend application](https://github.com/google-cloud-japan/m10l-chat-antidote-frontend-demo) integrates the application in this repository, or you can also use one of the browser's WebSocket clients from the [Chrome Web Store](https://chrome.google.com/webstore/search/websocket).
 
 
 ## Preparations
@@ -71,9 +70,10 @@ curl --location --request GET 'http://${SERVER_ADDRESS}/chats/groups/{group_id}'
   "text": "",
   "sender": {
     "name": "白井",
-    "lang": "ja"
+    "lang": "ja",
+    "photoUrl": "${PHOTO_PROFILE_URL}"
   },
-  "groupId": "${GROUP_ID}"
+  "groupId": "${CHAT_GROUP_ID}"
 }
 ```
 
@@ -84,7 +84,8 @@ curl --location --request GET 'http://${SERVER_ADDRESS}/chats/groups/{group_id}'
   "text": "こんにちは。白井です。",
   "sender": {
     "name": "白井",
-    "lang": "ja"
+    "lang": "ja",
+    "photoUrl": "${PHOTO_PROFILE_URL}"
   },
   "groupId": "${GROUP_ID}"
 }
@@ -97,17 +98,17 @@ curl --location --request GET 'http://${SERVER_ADDRESS}/chats/groups/{group_id}'
     "id": "2ebc0285-9d3f-444a-b0be-960ec1f78534",
     "num": 4,
     "lang": "ja",
-    "text": "こんにちは",
+    "text": "こんにちは。白井です。",
     "type": "TALK",
     "createdAt": "2021-12-21T10:17:45.559943Z",
     "sender": {
-      "name": "user2",
+      "name": "Shirai",
       "photoUrl": "https://upload.wikimedia.org/wikipedia/commons/9/9a/Gull_portrait_ca_usa.jpg"
     },
     "translations": [
       {
         "lang": "en",
-        "text": "Hello",
+        "text": "Hello. I am Shirai.",
         "toxicityScore": 0.03855397,
         "original": false
       }
